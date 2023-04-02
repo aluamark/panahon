@@ -3,7 +3,6 @@ import date from "date-and-time";
 import { useCoordsContext } from "../../context/coords";
 import { useWeatherDataContext } from "../../context/weather";
 import fetchWeather from "../../../lib/fetchWeather";
-import getTempColor from "../../../lib/getTempColor";
 import Detail from "./Detail";
 import {
 	BsWind,
@@ -15,7 +14,6 @@ import {
 import { MdOutlineVisibility } from "react-icons/md";
 import "./weather.css";
 import { CSSTransition } from "react-transition-group";
-import { CircleLoader } from "react-spinners";
 
 const directions = [
 	"N",
@@ -60,9 +58,34 @@ const WeatherData = () => {
 			setDirection(directions[section]);
 
 			// set temperature gradient color
-			const celsius = Math.floor(response.main.feels_like - 273.15);
-			const color = getTempColor(celsius);
-			setTempColor(color);
+			let celsius = Math.floor(response.main.feels_like - 273.15);
+			if (celsius >= 45) {
+				setTempColor("to-red-950");
+			} else if (celsius >= 40) {
+				setTempColor("to-red-900");
+			} else if (celsius >= 35) {
+				setTempColor("to-red-800");
+			} else if (celsius >= 30) {
+				setTempColor("to-orange-700");
+			} else if (celsius >= 25) {
+				setTempColor("to-orange-600");
+			} else if (celsius >= 20) {
+				setTempColor("to-orange-500");
+			} else if (celsius >= 15) {
+				setTempColor("to-amber-400");
+			} else if (celsius >= 10) {
+				setTempColor("to-amber-300");
+			} else if (celsius >= 5) {
+				setTempColor("to-yellow-200");
+			} else if (celsius >= 0) {
+				setTempColor("to-indigo-500");
+			} else if (celsius >= -10) {
+				setTempColor("to-indigo-600");
+			} else if (celsius >= -20) {
+				setTempColor("to-indigo-700");
+			} else {
+				setTempColor("to-indigo-800");
+			}
 
 			// convert sunrise & sunset time
 			setSunrise(date.format(new Date(response.sys.sunrise * 1000), "hh:mm A"));
@@ -82,7 +105,7 @@ const WeatherData = () => {
 				setCoords({ latitude, longitude });
 			});
 		}
-	}, [setCoords]);
+	}, []);
 
 	useEffect(() => {
 		if (coords) {
@@ -91,9 +114,7 @@ const WeatherData = () => {
 	}, [coords]);
 
 	if (isLoading) {
-		return (
-			<CircleLoader color="#eab308" className="mx-auto my-3 animate-pulse" />
-		);
+		return <p className="text-center">Loading...</p>;
 	}
 
 	if (error) {
@@ -117,7 +138,7 @@ const WeatherData = () => {
 							width={100}
 							height={100}
 							alt={`${weatherData.weather[0].main} image`}
-							className="mx-auto hover:scale-110 duration-300"
+							className="mx-auto hover:scale-110 duration-500"
 						/>
 						<h4>{`${weatherData.weather[0].main} / ${weatherData.weather[0].description}`}</h4>
 					</div>
@@ -129,7 +150,7 @@ const WeatherData = () => {
 						classNames="my-node"
 					>
 						<div className="flex justify-center">
-							<div className="relative flex p-5 hover:animate-pulse">
+							<div className="relative flex p-5">
 								<div
 									className={`relative font-bold text-8xl text-transparent bg-clip-text bg-gradient-to-r from-neutral-300 ${tempColor}`}
 								>
