@@ -9,6 +9,10 @@ const nextConfig = {
 				protocol: "https",
 				hostname: "openweathermap.org",
 			},
+			{
+				protocol: "http",
+				hostname: "openweathermap.org",
+			},
 		],
 	},
 };
