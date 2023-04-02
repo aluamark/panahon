@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import "./weather.css";
 import date from "date-and-time";
+import { CSSTransition } from "react-transition-group";
+import { CircleLoader } from "react-spinners";
 import { useCoordsContext } from "../../context/coords";
 import { useWeatherDataContext } from "../../context/weather";
 import fetchWeather from "../../../lib/fetchWeather";
-import Detail from "./Detail";
 import {
 	BsWind,
 	BsWater,
@@ -12,8 +15,7 @@ import {
 	BsSunset,
 } from "react-icons/bs";
 import { MdOutlineVisibility } from "react-icons/md";
-import "./weather.css";
-import { CSSTransition } from "react-transition-group";
+import Detail from "./Detail";
 
 const directions = [
 	"N",
@@ -97,6 +99,25 @@ const WeatherData = () => {
 		setIsLoading(false);
 	};
 
+	const shimmer = (w, h) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g">
+      <stop stop-color="#333" offset="20%" />
+      <stop stop-color="#222" offset="50%" />
+      <stop stop-color="#333" offset="70%" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="#333" />
+  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+</svg>`;
+
+	const toBase64 = (str) =>
+		typeof window === "undefined"
+			? Buffer.from(str).toString("base64")
+			: window.btoa(str);
+
 	useEffect(() => {
 		// get user location
 		if ("geolocation" in navigator) {
@@ -114,11 +135,13 @@ const WeatherData = () => {
 	}, [coords]);
 
 	if (isLoading) {
-		return <p className="text-center">Loading...</p>;
+		return <CircleLoader color="#eab308" className="mx-auto my-5" />;
 	}
 
 	if (error) {
-		return <p className="text-center">System error: {error.message}</p>;
+		return (
+			<p className="text-center text-red-500">System error: {error.message}</p>
+		);
 	}
 
 	return (
@@ -133,12 +156,17 @@ const WeatherData = () => {
 						</h5>
 
 						<h6>{dateAndTime}</h6>
-						<img
+						<Image
 							src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}
-							width={100}
-							height={100}
 							alt={`${weatherData.weather[0].main} image`}
 							className="mx-auto hover:scale-110 duration-500"
+							width={100}
+							height={100}
+							quality={100}
+							placeholder="blur"
+							blurDataURL={`data:image/svg+xml;base64,${toBase64(
+								shimmer(100, 100)
+							)}`}
 						/>
 						<h4>{`${weatherData.weather[0].main} / ${weatherData.weather[0].description}`}</h4>
 					</div>
