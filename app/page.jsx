@@ -10,7 +10,7 @@ export default function Home() {
 			<Navbar />
 			<main className="py-20 max-w-screen-md mx-auto">
 				<div className="flex flex-col items-center">
-					<h1 className="text-xl">Hello, how's your panahon?</h1>
+					<h1 className="text-xl">Hello, how&apos;s your panahon?</h1>
 					<Search />
 					<Weather />
 				</div>

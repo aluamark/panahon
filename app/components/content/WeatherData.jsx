@@ -82,7 +82,7 @@ const WeatherData = () => {
 				setCoords({ latitude, longitude });
 			});
 		}
-	}, []);
+	}, [setCoords]);
 
 	useEffect(() => {
 		if (coords) {
