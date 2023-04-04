@@ -17,24 +17,9 @@ import {
 import { MdOutlineVisibility } from "react-icons/md";
 import Detail from "./Detail";
 
-const directions = [
-	"N",
-	"NNE",
-	"NE",
-	"ENE",
-	"E",
-	"ESE",
-	"SE",
-	"SSE",
-	"S",
-	"SSW",
-	"SW",
-	"WSW",
-	"W",
-	"WNW",
-	"NW",
-	"NNW",
-];
+import directions from "../../../lib/directions";
+import toBase64 from "../../../lib/toBase64";
+import shimmer from "../../../lib/shimmer";
 
 const WeatherData = () => {
 	const { coords, setCoords } = useCoordsContext(null);
@@ -99,25 +84,6 @@ const WeatherData = () => {
 		setIsLoading(false);
 	};
 
-	const shimmer = (w, h) => `
-<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <linearGradient id="g">
-      <stop stop-color="#333" offset="20%" />
-      <stop stop-color="#222" offset="50%" />
-      <stop stop-color="#333" offset="70%" />
-    </linearGradient>
-  </defs>
-  <rect width="${w}" height="${h}" fill="#333" />
-  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
-  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
-</svg>`;
-
-	const toBase64 = (str) =>
-		typeof window === "undefined"
-			? Buffer.from(str).toString("base64")
-			: window.btoa(str);
-
 	useEffect(() => {
 		// get user location
 		if ("geolocation" in navigator) {
@@ -135,7 +101,12 @@ const WeatherData = () => {
 	}, [coords]);
 
 	if (isLoading) {
-		return <CircleLoader color="#eab308" className="mx-auto my-5" />;
+		return (
+			<div className="flex flex-col gap-3 text-center">
+				<p>Please turn on location services</p>
+				<CircleLoader color="#eab308" className="mx-auto" />
+			</div>
+		);
 	}
 
 	if (error) {
@@ -148,7 +119,7 @@ const WeatherData = () => {
 		<>
 			{weatherData && (
 				<div>
-					<div className="text-center">
+					<section className="text-center">
 						<h5 className="text-xl font-semibold">
 							<span className="text-yellow-500">
 								{weatherData.name}, {weatherData.sys.country}
@@ -169,7 +140,7 @@ const WeatherData = () => {
 							)}`}
 						/>
 						<h4>{`${weatherData.weather[0].main} / ${weatherData.weather[0].description}`}</h4>
-					</div>
+					</section>
 
 					<CSSTransition
 						in={true}
@@ -177,7 +148,7 @@ const WeatherData = () => {
 						timeout={3000}
 						classNames="my-node"
 					>
-						<div className="flex justify-center">
+						<section className="flex justify-center">
 							<div className="relative flex p-5">
 								<div
 									className={`relative font-bold text-8xl text-transparent bg-clip-text bg-gradient-to-r from-neutral-300 ${tempColor}`}
@@ -188,10 +159,10 @@ const WeatherData = () => {
 									</div>
 								</div>
 							</div>
-						</div>
+						</section>
 					</CSSTransition>
 
-					<div className="xs:w-[301.75px] mx-auto">
+					<section className="xs:w-[301.75px] mx-auto">
 						<Detail
 							icon={<BsWind />}
 							detail="Wind"
@@ -212,8 +183,9 @@ const WeatherData = () => {
 							detail="Visibility"
 							data={`${weatherData.visibility / 1000}km`}
 						/>
-					</div>
-					<div className="xs:w-[301.75px] mx-auto pt-5">
+					</section>
+
+					<section className="xs:w-[301.75px] mx-auto pt-5">
 						<div className="flex justify-between">
 							<div>
 								<BsSunrise className="fill-yellow-400 w-10 h-10 mx-auto hover:-translate-y-1 duration-300" />
@@ -225,7 +197,7 @@ const WeatherData = () => {
 								{sunset}
 							</div>
 						</div>
-					</div>
+					</section>
 				</div>
 			)}
 		</>
